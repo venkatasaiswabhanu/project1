@@ -23,6 +23,7 @@ def test_change_mysql_password(old_password_file):
     # Check if the old password file has been updated
     new_password = read_old_password(old_password_file)
     assert len(new_password) == 20  # New password length should be 20 characters
+    assert result == new_password
 
 
 def test_change_mysql_password_failure(old_password_file):
