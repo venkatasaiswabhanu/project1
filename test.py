@@ -1,5 +1,7 @@
 import os
+import subprocess
 import pytest
+from pathlib import Path
 from password_rotation import change_mysql_password
 
 
