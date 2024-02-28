@@ -53,5 +53,5 @@ def change_mysql_password(old_password_file):
         print("Something went wrong.")
 
 # Get path to old password file from user input
-old_password_file = input("Enter path to old password file: ")
+old_password_file = "pwd.txt"
 change_mysql_password(old_password_file)
