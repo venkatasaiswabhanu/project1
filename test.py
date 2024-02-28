@@ -3,10 +3,7 @@ import mysql.connector
 import os
 
 class TestMySQLPasswordChange(unittest.TestCase):
-    def setUp(self):
-        # Ensure the password file exists
-        old_password_file = "pwd.txt"
-        open(self.old_password_file, 'a').close()  # Create an empty pwd.txt if it doesn't exist
+
     def read_password(file_path):
         with open(file_path, 'r') as file:
             return file.readline().strip()
