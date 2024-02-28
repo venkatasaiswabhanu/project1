@@ -25,7 +25,7 @@ def test_change_mysql_password_success(old_password_file, monkeypatch):
 
     # Apply monkeypatching
     monkeypatch.setattr("subprocess.run", mock_subprocess_run)
-    monkeypatch.setattr("password_rotation.check_mysql_connection", mock_check_mysql_connection)
+    monkeypatch.setattr("app.check_mysql_connection", mock_check_mysql_connection)
 
     result = change_mysql_password(old_password_file)
     assert result == "Success"
@@ -43,7 +43,7 @@ def test_change_mysql_password_failure(old_password_file, monkeypatch):
 
     # Apply monkeypatching
     monkeypatch.setattr("subprocess.run", mock_subprocess_run)
-    monkeypatch.setattr("password_rotation.check_mysql_connection", mock_check_mysql_connection)
+    monkeypatch.setattr("app.check_mysql_connection", mock_check_mysql_connection)
 
     result = change_mysql_password(old_password_file)
     assert result == "Failed"
