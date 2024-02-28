@@ -1,15 +1,29 @@
-import subprocess
+import unittest
+import mysql.connector
+import os
 
-def test_password_rotation():
-    # Run the script and capture its output
-    result = subprocess.run(['python', 'password_rotation.py'], capture_output=True, text=True)
+class TestMySQLPasswordChange(unittest.TestCase):
+    def setUp(self):
+        # Ensure the password file exists
+        self.old_password_file = "pwd.txt"
+        open(self.old_password_file, 'a').close()  # Create an empty pwd.txt if it doesn't exist
 
-    # Check if the script execution was successful
-    assert result.returncode == 0, f"Script execution failed with return code {result.returncode}.\nstderr: {result.stderr}"
+    def test_mysql_login(self):
+        try:
+            # Read the password from pwd.txt
+            with open(self.old_password_file, 'r') as file:
+                password = file.readline().strip()
 
-    # Check if the script output contains success or failure messages
-    assert "MySQL password changed successfully." in result.stdout or "Failed to change MySQL password:" in result.stdout
-    if "MySQL password changed successfully." in result.stdout:
-        assert "Successfully able to login with new password." in result.stdout
-    elif "Failed to change MySQL password:" in result.stdout:
-        assert "Something went wrong." in result.stdout
+            # Attempt MySQL connection using the password from pwd.txt
+            connection = mysql.connector.connect(host='localhost',
+                                                 user='root',
+                                                 password=password)
+            connection.close()
+            # If the connection is successful, the test passes
+            self.assertTrue(True)
+        except mysql.connector.Error as error:
+            # If there's an error connecting, the test fails
+            self.fail(f"Failed to connect to MySQL: {error}")
+
+if __name__ == '__main__':
+    unittest.main()
