@@ -1,7 +1,7 @@
 import subprocess
 import pytest
 from pathlib import Path
-from password_rotation import change_mysql_password
+from app import change_mysql_password
 
 
 @pytest.fixture
