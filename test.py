@@ -1,29 +1,49 @@
-import unittest
-import mysql.connector
-import os
+import subprocess
+import pytest
+from pathlib import Path
+from password_rotation import change_mysql_password
 
-class TestMySQLPasswordChange(unittest.TestCase):
 
-    def read_password(self, file_path):
-        with open(file_path, 'r') as file:
-            return file.readline().strip()
+@pytest.fixture
+def old_password_file(tmp_path):
+    # Create a temporary file for the old password
+    file_path = tmp_path / "pwd.txt"
+    with open(file_path, "w") as f:
+        f.write("old_password")
+    return file_path
 
-    def test_mysql_login(self):
-        try:
-            # Read the password from pwd.txt
-            old_password_file = "pwd.txt"
-            old_password = self.read_password(old_password_file)
 
-            # Attempt MySQL connection using the password from pwd.txt
-            connection = mysql.connector.connect(host='localhost',
-                                                 user='root',
-                                                 password=old_password)
-            connection.close()
-            # If the connection is successful, the test passes
-            self.assertTrue(True)
-        except mysql.connector.Error as error:
-            # If there's an error connecting, the test fails
-            self.fail(f"Failed to connect to MySQL: {error}")
+def test_change_mysql_password_success(old_password_file, monkeypatch):
+    # Mocking subprocess.run to prevent actual password change
+    def mock_subprocess_run(command, check, stderr):
+        # Simulate successful password change
+        return None
 
-if __name__ == '__main__':
-    unittest.main()
+    # Mocking check_mysql_connection to simulate successful connection
+    def mock_check_mysql_connection(password):
+        return True
+
+    # Apply monkeypatching
+    monkeypatch.setattr("subprocess.run", mock_subprocess_run)
+    monkeypatch.setattr("password_rotation.check_mysql_connection", mock_check_mysql_connection)
+
+    result = change_mysql_password(old_password_file)
+    assert result == "Success"
+
+
+def test_change_mysql_password_failure(old_password_file, monkeypatch):
+    # Mocking subprocess.run to prevent actual password change
+    def mock_subprocess_run(command, check, stderr):
+        # Simulate failed password change
+        raise subprocess.CalledProcessError(returncode=1, cmd=command)
+
+    # Mocking check_mysql_connection to simulate unsuccessful connection
+    def mock_check_mysql_connection(password):
+        return False
+
+    # Apply monkeypatching
+    monkeypatch.setattr("subprocess.run", mock_subprocess_run)
+    monkeypatch.setattr("password_rotation.check_mysql_connection", mock_check_mysql_connection)
+
+    result = change_mysql_password(old_password_file)
+    assert result == "Failed"
