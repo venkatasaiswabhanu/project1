@@ -39,9 +39,10 @@ def change_mysql_password(old_password_file):
     # Change MySQL password
     command = ['mysql', '-u', 'root', '-p' + old_password, '-e', f"ALTER USER 'root'@'localhost' IDENTIFIED BY '{new_password}';"]
     try:
-        subprocess.run(command, check=True, stderr=subprocess.PIPE)
+        process = subprocess.run(command, check=True, stderr=subprocess.PIPE)
     except subprocess.CalledProcessError as e:
-        print("Failed to change MySQL password:", e.stderr.decode())
+        error_message = e.stderr.decode() if e.stderr else "No error message available"
+        print("Failed to change MySQL password:", error_message)
         return "Failed"
 
     # Write new password to the same file
