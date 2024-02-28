@@ -5,14 +5,15 @@ import os
 class TestMySQLPasswordChange(unittest.TestCase):
     def setUp(self):
         # Ensure the password file exists
-        self.old_password_file = "pwd.txt"
+        old_password_file = "pwd.txt"
         open(self.old_password_file, 'a').close()  # Create an empty pwd.txt if it doesn't exist
-
+    def read_password(file_path):
+        with open(file_path, 'r') as file:
+            return file.readline().strip()
     def test_mysql_login(self):
         try:
             # Read the password from pwd.txt
-            with open(self.old_password_file, 'r') as file:
-                password = file.readline().strip()
+            old_password = read_password(old_password_file)
 
             # Attempt MySQL connection using the password from pwd.txt
             connection = mysql.connector.connect(host='localhost',
