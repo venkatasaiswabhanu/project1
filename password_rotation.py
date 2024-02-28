@@ -1,6 +1,7 @@
 import subprocess
 import string
 import random
+import mysql.connector
 
 # Function to generate a new random password
 def generate_password(length=20):
@@ -17,7 +18,17 @@ def write_new_password(file_path, new_password):
     with open(file_path, 'w') as file:
         file.write(new_password)
 
-# Main function to change password
+def check_mysql_connection(password):
+    try:
+        connection = mysql.connector.connect(host='localhost',
+                                             user='root',
+                                             password=password)
+        connection.close()
+        return True
+    except mysql.connector.Error as error:
+        print("Failed to connect to MySQL: {}".format(error))
+        return False
+
 def change_mysql_password(old_password_file):
     # Read old password from file
     old_password = read_old_password(old_password_file)
@@ -34,6 +45,12 @@ def change_mysql_password(old_password_file):
 
     print("MySQL password changed successfully.")
     print(f"New password: {new_password}")
+
+    # Check if connection can be established with the new password
+    if check_mysql_connection(new_password):
+        print("Successfully able to login with new password.")
+    else:
+        print("Something went wrong.")
 
 # Get path to old password file from user input
 old_password_file = input("Enter path to old password file: ")
