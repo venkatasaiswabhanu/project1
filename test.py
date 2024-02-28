@@ -10,6 +10,7 @@ class TestMySQLPasswordChange(unittest.TestCase):
 
     def test_mysql_login(self):
         try:
+            
             # Read the password from pwd.txt
             old_password_file = "pwd.txt"
             old_password = self.read_password(old_password_file)
